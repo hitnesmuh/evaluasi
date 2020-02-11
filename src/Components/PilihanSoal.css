@@ -1,0 +1,14 @@
+.pilihan-soal-box-outer {
+  display: inline-block;
+  width: 3rem;
+  height: 3rem;
+  border: solid black;
+  margin-right: 0.4rem;
+  margin-bottom: 0.4rem;
+  text-align: center;
+  padding-top: 0.5rem;
+}
+
+.pilihan-soal-box-outer:hover {
+  cursor: pointer;
+}
