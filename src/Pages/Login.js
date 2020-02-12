@@ -48,7 +48,7 @@ export default class Login extends Component {
                 </div>
 
                 <div className="login-page-button row justify-content-center">
-                  <NavLink href="/soal">
+                  <NavLink href="/token">
                     <Button className="btn btn-success">Login</Button>
                   </NavLink>
                 </div>

@@ -5,6 +5,7 @@ import "./Soal.css";
 
 import PilihanGanda from "../Components/PilihanGanda";
 import PilihanSoal from "../Components/PilihanSoal";
+import TopBar from "../Components/TopBar";
 
 const SOAL = [
   {
@@ -63,7 +64,7 @@ export default class Soal extends Component {
   render() {
     return (
       <div>
-        <div className="soal-top-bar"></div>
+        <TopBar></TopBar>
         <div className="container">
           <div className="row">
             <div className="col-md-8 soal-box-outer">

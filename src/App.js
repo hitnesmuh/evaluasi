@@ -2,19 +2,27 @@ import "./App.css";
 
 import Login from "./Pages/Login";
 import Soal from "./Pages/Soal";
+import Token from "./Pages/Token";
+import Konfirmasi from "./Pages/Konfirmasi";
 
 import React from "react";
 import { BrowserRouter as Router, Switch, Route, Link } from "react-router-dom";
 
 export default function App() {
   return (
-    <Router>
+    <Router basename="/evaluasi">
       <Switch>
-        <Route path="/login">
+        <Route exact path="/">
           <Login />
         </Route>
         <Route path="/soal">
           <Soal />
+        </Route>
+        <Route path="/token">
+          <Token />
+        </Route>
+        <Route path="/konfirmasi">
+          <Konfirmasi />
         </Route>
       </Switch>
     </Router>

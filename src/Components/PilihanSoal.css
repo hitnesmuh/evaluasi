@@ -1,9 +1,10 @@
 .pilihan-soal-box-outer {
   display: inline-block;
-  width: 3rem;
-  height: 3rem;
+  width: 3.5rem;
+  height: 3.5rem;
   border: solid black;
-  margin-right: 0.4rem;
+  margin-right: 0.2rem;
+  margin-left: 0.2rem;
   margin-bottom: 0.4rem;
   text-align: center;
   padding-top: 0.5rem;
