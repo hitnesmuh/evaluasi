@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import Countdown from "react-countdown";
+import { Button, Modal, ButtonToolbar } from "react-bootstrap";
 
 import "./Soal.css";
 
@@ -36,14 +37,97 @@ const SOAL = [
   }
 ];
 
-class Time extends Component {
+const Time = () => {
+  return <Countdown date={Date.now() + 500000}></Countdown>;
+};
+
+class ModalEnd extends Component {
+  state = {
+    check: false
+  };
+
+  onCheckCheckBox = () => {
+    this.setState({
+      check: !this.state.check
+    });
+
+    console.log(this.state.check);
+  };
+
+  falseCheckBox = () => {
+    this.setState({
+      check: false
+    });
+  };
+
   render() {
-    return <Countdown date={Date.now() + 500000}></Countdown>;
+    return (
+      <Modal
+        {...this.props}
+        size="lg"
+        aria-labelledby="contained-modal-title-vcenter"
+        centered
+      >
+        <Modal.Header className="bg-secondary" closeButton>
+          <Modal.Title
+            className="text-light"
+            id="contained-modal-title-vcenter"
+          >
+            Konfirmasi Tes
+          </Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <h5 className="text-center">
+            Apakah anda yakin ingin mengakhiri tes? <br></br>
+            Anda tidak akan bisa kembali ke soal jika sudah menekan tombol
+            selesai
+          </h5>
+          <input
+            className="text-center"
+            id="konfirmasiTes"
+            type="checkbox"
+            onChange={this.onCheckCheckBox}
+          />
+          <label className="form-check-label" htmlFor="konfirmasiTes">
+            Centang, kemudian tekan tombol selesai. Jika anda yakin untuk
+            mengakhiri tes.
+          </label>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button
+            disabled={this.state.check ? false : true}
+            className="btn btn-success"
+            onClick={this.props.onHide}
+          >
+            Selesai
+          </Button>
+          <Button
+            className="btn btn-danger"
+            onClick={() => {
+              this.props.onHide();
+              this.falseCheckBox();
+            }}
+          >
+            Tidak
+          </Button>
+        </Modal.Footer>
+      </Modal>
+    );
   }
 }
 
 export default class Soal extends Component {
-  state = { customFont: "pilihan-ganda-custom-font-kecil" };
+  state = {
+    customFont: "pilihan-ganda-custom-font-kecil",
+    modalShow: false,
+    setModalShow: false
+  };
+
+  setModalShow = x => {
+    this.setState({
+      modalShow: x
+    });
+  };
 
   changeFont = size => {
     if (size === "kecil") {
@@ -135,9 +219,26 @@ export default class Soal extends Component {
                   <button className="btn text-uppercase btn-warning mr-2">
                     <input type="checkbox"></input>Ragu Ragu
                   </button>
-                  <button className="btn text-uppercase btn-primary">
+                  {/* <button className="btn text-uppercase btn-primary">
                     Soal Berikutnya<i className="fas fa-arrow-right ml-3"></i>
-                  </button>
+                  </button> */}
+                  {/* <button className="btn text-uppercase btn-primary">
+                    Tes Selesai<i className="fas fa-arrow-right ml-3"></i>
+                  </button> */}
+                  <ButtonToolbar>
+                    <Button
+                      className="btn text-uppercase btn-primary"
+                      variant="primary"
+                      onClick={() => this.setModalShow(true)}
+                    >
+                      Tes Selesai
+                    </Button>
+
+                    <ModalEnd
+                      show={this.state.modalShow}
+                      onHide={() => this.setModalShow(false)}
+                    />
+                  </ButtonToolbar>
                 </div>
               </div>
             </div>
