@@ -1,0 +1,26 @@
+.logout-box {
+  width: 25rem;
+  height: 15rem;
+  background-color: white;
+  border-radius: 5px;
+  margin-right: auto;
+  margin-left: auto;
+  margin-top: 10rem;
+}
+
+.logout-title {
+  padding: 1.25rem;
+  font-weight: bold;
+  font-size: 1.3rem;
+}
+
+.logout-content {
+  padding: 1.25rem;
+  font-size: 0.8rem;
+}
+
+.logout-button {
+  font-weight: bold;
+  padding-right: 1.25rem;
+  padding-left: 1.25rem;
+}

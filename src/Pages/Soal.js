@@ -7,6 +7,7 @@ import "./Soal.css";
 import PilihanGanda from "../Components/PilihanGanda";
 import PilihanSoal from "../Components/PilihanSoal";
 import TopBar from "../Components/TopBar";
+import NavLink from "../Components/NavLink";
 
 const SOAL = [
   {
@@ -94,13 +95,16 @@ class ModalEnd extends Component {
           </label>
         </Modal.Body>
         <Modal.Footer>
-          <Button
-            disabled={this.state.check ? false : true}
-            className="btn btn-success"
-            onClick={this.props.onHide}
-          >
-            Selesai
-          </Button>
+          <NavLink href="/logout">
+            <Button
+              disabled={this.state.check ? false : true}
+              className="btn btn-success"
+              onClick={this.props.onHide}
+            >
+              Selesai
+            </Button>
+          </NavLink>
+
           <Button
             className="btn btn-danger"
             onClick={() => {
