@@ -82,7 +82,7 @@ export default class Konfirmasi extends Component {
                 melewati waktu mulai tes. Tekan tombol F5 untuk merefresh
                 halaman.
               </div>
-              <NavLink className="asd" href="/soal">
+              <NavLink href="/soal">
                 <Button className="btn btn-danger mb-2 form-control">
                   MULAI
                 </Button>
