@@ -25,10 +25,10 @@ export default function App() {
         <Route path="/konfirmasi">
           <Konfirmasi />
         </Route>
+        <Route path="/logout">
+          <Logout />
+        </Route>
       </Switch>
-      <Route path="/logout">
-        <Logout />
-      </Route>
     </Router>
   );
 }
