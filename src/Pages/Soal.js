@@ -95,7 +95,7 @@ class ModalEnd extends Component {
           </label>
         </Modal.Body>
         <Modal.Footer>
-          <NavLink href="/logout">
+          <NavLink href="/daftar-ujian">
             <Button
               disabled={this.state.check ? false : true}
               className="btn btn-success"
