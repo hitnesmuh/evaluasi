@@ -51,8 +51,6 @@ class ModalEnd extends Component {
     this.setState({
       check: !this.state.check
     });
-
-    console.log(this.state.check);
   };
 
   falseCheckBox = () => {
