@@ -10,7 +10,7 @@ const Pilihan = (props) => {
       <div className="col-1">
         <div
           onClick={() => {
-            props.tickBullet(props.index);
+            props.tickBullet(props.index, props.isRight);
           }}
           className={props.tick}
         >
@@ -25,12 +25,12 @@ const Pilihan = (props) => {
 };
 
 export default class PilihanGanda extends Component {
-  state = { selected: null };
-
-  tickBullet = (bullet) => {
-    this.setState({
-      selected: bullet,
-    });
+  tickBullet = (bullet, isRight) => {
+    if (isRight === 1) {
+      this.props.onClickJawaban(bullet, true);
+    } else {
+      this.props.onClickJawaban(bullet, false);
+    }
   };
 
   render() {
@@ -42,11 +42,12 @@ export default class PilihanGanda extends Component {
             return (
               <Pilihan
                 key={index}
+                isRight={jawaban.is_right}
                 jawaban={jawaban.pilihan}
                 index={index}
                 tickBullet={this.tickBullet}
                 tick={
-                  this.state.selected === index
+                  this.props.jawaban.indexJawaban === index
                     ? "pilihan-ganda-bullet bg-success"
                     : "pilihan-ganda-bullet"
                 }

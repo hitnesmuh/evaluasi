@@ -1,107 +1,32 @@
 import React, { Component } from "react";
 import Countdown from "react-countdown";
-import { Button, Modal, ButtonToolbar } from "react-bootstrap";
 import { withRouter } from "react-router-dom";
+import { AuthContext } from "../Contexts/Authentication";
+import ReactModal from "react-modal";
 
 import "./Soal.css";
 
 import PilihanGanda from "../Components/PilihanGanda";
 import PilihanSoal from "../Components/PilihanSoal";
 import TopBar from "../Components/TopBar";
-import NavLink from "../Components/NavLink";
 
 const Time = (props) => {
   return (
     <Countdown
       onComplete={() => {
-        console.log(props.history.push("/logout"));
+        props.history.push("/logout");
+        props.hitungNilai();
       }}
       date={Date.now() + 500000}
     ></Countdown>
   );
 };
 
-class ModalEnd extends Component {
-  state = {
-    check: false,
-  };
-
-  onCheckCheckBox = () => {
-    this.setState({
-      check: !this.state.check,
-    });
-  };
-
-  falseCheckBox = () => {
-    this.setState({
-      check: false,
-    });
-  };
-
-  render() {
-    return (
-      <Modal
-        {...this.props}
-        size="lg"
-        aria-labelledby="contained-modal-title-vcenter"
-        centered
-      >
-        <Modal.Header className="bg-secondary" closeButton>
-          <Modal.Title
-            className="text-light"
-            id="contained-modal-title-vcenter"
-          >
-            Konfirmasi Tes
-          </Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <h5 className="text-center">
-            Apakah anda yakin ingin mengakhiri tes? <br></br>
-            Anda tidak akan bisa kembali ke soal jika sudah menekan tombol
-            selesai
-          </h5>
-          <input
-            className="text-center"
-            id="konfirmasiTes"
-            type="checkbox"
-            onChange={this.onCheckCheckBox}
-          />
-          <label className="form-check-label" htmlFor="konfirmasiTes">
-            Centang, kemudian tekan tombol selesai. Jika anda yakin untuk
-            mengakhiri tes.
-          </label>
-        </Modal.Body>
-        <Modal.Footer>
-          <NavLink href="/logout">
-            <Button
-              disabled={this.state.check ? false : true}
-              className="btn btn-success"
-              onClick={this.props.onHide}
-            >
-              Selesai
-            </Button>
-          </NavLink>
-
-          <Button
-            className="btn btn-danger"
-            onClick={() => {
-              this.props.onHide();
-              this.falseCheckBox();
-            }}
-          >
-            Tidak
-          </Button>
-        </Modal.Footer>
-      </Modal>
-    );
-  }
-}
-
 class Soal extends Component {
+  static contextType = AuthContext;
+
   state = {
     customFont: "pilihan-ganda-custom-font-kecil",
-    modalShow: false,
-    setModalShow: false,
     soal: [
       {
         id: 1,
@@ -117,12 +42,16 @@ class Soal extends Component {
       },
     ],
     nomor: 0,
+    jawaban: [{ no: 0, indexJawaban: null, jawaban: null, ragu: false }],
+    showModal: false,
   };
 
-  setModalShow = (x) => {
-    this.setState({
-      modalShow: x,
-    });
+  handleOpenModal = () => {
+    this.setState({ showModal: true });
+  };
+
+  handleCloseModal = () => {
+    this.setState({ showModal: false });
   };
 
   changeFont = (size) => {
@@ -147,11 +76,21 @@ class Soal extends Component {
       redirect: "follow",
     };
 
-    fetch("http://127.0.0.1:5000/alltest", requestOptions)
+    fetch(`${process.env.REACT_APP_API_URL}/alltest`, requestOptions)
       .then((response) => response.json())
       .then((result) => {
+        let x = [];
+        result.forEach((data, index) => {
+          x.push({
+            no: index,
+            indexJawaban: null,
+            jawaban: null,
+            ragu: false,
+          });
+        });
         this.setState({
           soal: result,
+          jawaban: x,
         });
       })
       .catch((error) => console.log("error", error));
@@ -167,6 +106,70 @@ class Soal extends Component {
     this.setState({
       nomor: this.state.nomor - 1,
     });
+  };
+
+  onClickJawaban = (index, status) => {
+    let x = this.state.jawaban;
+    x[this.state.nomor].jawaban = status;
+    x[this.state.nomor].indexJawaban = index;
+    this.setState({
+      jawaban: x,
+    });
+  };
+
+  onClickRagu = () => {
+    let x = this.state.jawaban;
+    x[this.state.nomor].ragu = !x[this.state.nomor].ragu;
+    this.setState({
+      jawaban: x,
+    });
+  };
+
+  navNumber = (index) => {
+    this.setState({
+      nomor: index,
+    });
+  };
+
+  hitungNilai = () => {
+    const myHeaders = new Headers();
+    myHeaders.append("Content-Type", "application/json");
+
+    let x = 0;
+
+    this.state.jawaban.forEach((data) => {
+      if (data.jawaban === true) {
+        x++;
+      }
+    });
+
+    x = (x / this.state.jawaban.length) * 100;
+
+    const raw = JSON.stringify({
+      id_kelas: this.context.data.id_kelas,
+      jenis_kelamin: this.context.data.jenis_kelamin,
+      nama: this.context.data.nama,
+      nis: this.context.data.nis,
+      password: this.context.data.password,
+      nilai_pretest: x,
+    });
+
+    const requestOptions = {
+      method: "PUT",
+      headers: myHeaders,
+      body: raw,
+      redirect: "follow",
+    };
+
+    fetch(
+      `${process.env.REACT_APP_API_URL}/siswa/${this.context.data.id}`,
+      requestOptions
+    )
+      .then((response) => response.json())
+      .then((result) => {
+        this.props.history.push("/logout");
+      })
+      .catch((error) => console.log("error", error));
   };
 
   componentDidMount() {
@@ -192,7 +195,10 @@ class Soal extends Component {
                     <div className="row text-center pt-2 m-0">
                       <div className="col-md-6 soal-sisa-waktu">Sisa Waktu</div>
                       <div className="col-md-6 soal-waktu">
-                        <Time history={this.props.history}></Time>
+                        <Time
+                          hitungNilai={this.hitungNilai}
+                          history={this.props.history}
+                        ></Time>
                       </div>
                     </div>
                   </div>
@@ -236,6 +242,8 @@ class Soal extends Component {
 
                 {this.state.soal !== null ? (
                   <PilihanGanda
+                    jawaban={this.state.jawaban[this.state.nomor]}
+                    onClickJawaban={this.onClickJawaban}
                     customFont={this.state.customFont}
                     soal={this.state.soal[this.state.nomor]}
                   ></PilihanGanda>
@@ -255,10 +263,12 @@ class Soal extends Component {
                   ) : (
                     ""
                   )}
-
-                  {/* <button className="btn text-uppercase btn-warning mr-2">
-                    <input type="checkbox"></input>Ragu Ragu
-                  </button> */}
+                  <button
+                    onClick={this.onClickRagu}
+                    className="btn text-uppercase btn-warning mr-2 text-white"
+                  >
+                    Ragu Ragu
+                  </button>
                   {this.state.nomor !== this.state.soal.length - 1 ? (
                     <button
                       onClick={this.soalBerikutnya}
@@ -271,30 +281,56 @@ class Soal extends Component {
                     ""
                   )}
 
-                  <ButtonToolbar>
-                    {this.state.nomor === this.state.soal.length - 1 ? (
-                      <Button
-                        className="btn text-uppercase btn-warning text-white"
-                        variant="primary"
-                        onClick={() => this.setModalShow(true)}
-                      >
-                        Tes Selesai
-                      </Button>
-                    ) : (
-                      ""
-                    )}
+                  {this.state.nomor === this.state.soal.length - 1 ? (
+                    <button
+                      onClick={this.handleOpenModal}
+                      className="btn text-uppercase btn-danger ml-2"
+                    >
+                      Selesai
+                    </button>
+                  ) : (
+                    ""
+                  )}
 
-                    <ModalEnd
-                      show={this.state.modalShow}
-                      onHide={() => this.setModalShow(false)}
-                    />
-                  </ButtonToolbar>
+                  <ReactModal
+                    isOpen={this.state.showModal}
+                    className="kelas-modal"
+                    overlayClassName="kelas-modal-overlay"
+                  >
+                    <h5 className="text-center">Konfirmasi Selesai</h5>
+                    <hr />
+                    <p className="text-center">
+                      Apakah anda yakin ingin mengakhiri tes? <br></br>
+                      Anda tidak akan bisa kembali ke soal jika sudah menekan
+                      tombol selesai
+                    </p>
+
+                    <div className="text-center">
+                      <button
+                        className="btn btn-danger"
+                        onClick={() => {
+                          this.hitungNilai();
+                        }}
+                      >
+                        Selesai
+                      </button>
+                      <button
+                        className="btn btn-outline-warning ml-3 cancel-button"
+                        onClick={this.handleCloseModal}
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  </ReactModal>
                 </div>
               </div>
             </div>
             <div className="col-md-4 soal-box-outer">
               <div className="soal-box-inner">
-                <PilihanSoal></PilihanSoal>
+                <PilihanSoal
+                  navNumber={this.navNumber}
+                  jawaban={this.state.jawaban}
+                ></PilihanSoal>
               </div>
             </div>
           </div>

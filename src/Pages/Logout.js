@@ -13,9 +13,9 @@ const Time = (props) => {
   return (
     <Countdown
       onComplete={() => {
-        console.log(props.history.push("/"));
+        props.history.push("/");
       }}
-      date={Date.now() + 50000}
+      date={Date.now() + 5000}
     ></Countdown>
   );
 };
