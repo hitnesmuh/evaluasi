@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import { withRouter } from "react-router-dom";
 
 import TopBar from "../Components/TopBar";
 
@@ -6,7 +7,7 @@ import { AuthContext } from "../Contexts/Authentication";
 
 import "./Token.css";
 
-const Content = props => {
+const Content = (props) => {
   return (
     <div>
       <div className="token-card-content">
@@ -18,11 +19,15 @@ const Content = props => {
   );
 };
 
-export default class Token extends Component {
+class Token extends Component {
   static contextType = AuthContext;
 
   state = {
-    label: []
+    label: [],
+    inputToken: "",
+    idToken: 1,
+    error: false,
+    errorMsg: "",
   };
 
   componentDidMount() {
@@ -31,29 +36,71 @@ export default class Token extends Component {
         {
           no: 1,
           nama: "Kode NISN",
-          content: this.context.data.nis
+          content: this.context.data.nis,
         },
         {
           no: 2,
           nama: "Nama Peserta",
-          content: this.context.data.nama
+          content: this.context.data.nama,
         },
         {
           no: 3,
           nama: "Jenis Kelamin",
-          content: this.context.data.jenis_kelamin
+          content: this.context.data.jenis_kelamin,
         },
         {
           no: 4,
           nama: "Mata Pelajaran",
-          content: "Matematika"
-        }
-      ]
+          content: "Matematika",
+        },
+      ],
     });
   }
 
-  onClickSubmit = event => {
+  onChangeToken = (event) => {
+    this.setState({
+      inputToken: event.target.value,
+    });
+  };
+
+  onClickSubmit = (event) => {
     event.preventDefault();
+
+    const myHeaders = new Headers();
+    myHeaders.append("Content-Type", "application/json");
+
+    const raw = JSON.stringify({ token: this.state.inputToken });
+
+    const requestOptions = {
+      method: "POST",
+      headers: myHeaders,
+      body: raw,
+      redirect: "follow",
+    };
+
+    fetch(
+      `${process.env.REACT_APP_API_URL}/token/${this.state.idToken}`,
+      requestOptions
+    )
+      .then((response) => response.json())
+      .then((result) => {
+        if (
+          Object.entries(result).length === 0 &&
+          result.constructor === Object
+        ) {
+          this.toggleError("Token Salah");
+        } else {
+          this.props.history.push("/soal");
+        }
+      })
+      .catch((error) => console.log("error", error));
+  };
+
+  toggleError = (msg) => {
+    this.setState({
+      errorMsg: msg,
+      error: true,
+    });
   };
 
   render() {
@@ -66,7 +113,7 @@ export default class Token extends Component {
             <div className="card-title token-card-title">
               Konfirmasi Data Peserta
             </div>
-            {this.state.label.map(data => {
+            {this.state.label.map((data) => {
               return (
                 <Content
                   key={data.no}
@@ -84,6 +131,8 @@ export default class Token extends Component {
                     className="token-input"
                     type="text"
                     id="token"
+                    value={this.state.inputToken}
+                    onChange={this.onChangeToken}
                   />
                   <button
                     onClick={this.onClickSubmit}
@@ -91,6 +140,9 @@ export default class Token extends Component {
                   >
                     Submit
                   </button>
+                </div>
+                <div className="mb-3 text-danger">
+                  {this.state.error ? this.state.errorMsg : ""}
                 </div>
               </div>
             </form>
@@ -100,3 +152,5 @@ export default class Token extends Component {
     );
   }
 }
+
+export default withRouter(Token);

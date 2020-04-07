@@ -1,12 +1,36 @@
 import React, { Component } from "react";
+import Countdown from "react-countdown";
 import { Button, Container } from "react-bootstrap";
+import { AuthContext } from "../Contexts/Authentication";
 
 import "./Logout.css";
 
 import TopBar from "../Components/TopBar";
 import NavLink from "../Components/NavLink";
+import { withRouter } from "react-router-dom";
 
-export default class Logout extends Component {
+const Time = (props) => {
+  return (
+    <Countdown
+      onComplete={() => {
+        console.log(props.history.push("/"));
+      }}
+      date={Date.now() + 50000}
+    ></Countdown>
+  );
+};
+
+class Logout extends Component {
+  static contextType = AuthContext;
+
+  logout = () => {
+    this.context.changeAuthToFalse();
+  };
+
+  componentDidMount() {
+    this.logout();
+  }
+
   render() {
     return (
       <div>
@@ -21,6 +45,13 @@ export default class Logout extends Component {
               Silahkan klik tombol <strong>LOGOUT</strong> untuk mengakhiri tes.
             </div>
             <hr />
+            <div className="p-3 text-center">
+              Akan Log Out Otomatis dalam
+              <hr />
+              <h3>
+                <Time history={this.props.history}></Time>
+              </h3>
+            </div>
             <div className="text-center">
               <NavLink href="/">
                 <Button className="text-uppercase btn btn-success logout-button">
@@ -34,3 +65,5 @@ export default class Logout extends Component {
     );
   }
 }
+
+export default withRouter(Logout);

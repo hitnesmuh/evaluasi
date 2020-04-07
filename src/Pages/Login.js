@@ -12,33 +12,33 @@ class Login extends Component {
     inputNis: "",
     inputPassword: "",
     error: false,
-    errorMsg: ""
+    errorMsg: "",
   };
 
-  handleChangeNis = event => {
+  handleChangeNis = (event) => {
     this.setState({
-      inputNis: event.target.value
+      inputNis: event.target.value,
     });
   };
 
-  handleChangePassword = event => {
+  handleChangePassword = (event) => {
     this.setState({
-      inputPassword: event.target.value
+      inputPassword: event.target.value,
     });
   };
 
   // Method untuk handle user ketika menekan tombol enter pada form login
-  handleKeyPress = event => {
+  handleKeyPress = (event) => {
     if (event.key === "Enter") {
       this.handleButtonLogin();
     }
   };
 
   // Method untuk memunculkan warning error pada saat login
-  toggleError = msg => {
+  toggleError = (msg) => {
     this.setState({
       error: true,
-      errorMsg: msg
+      errorMsg: msg,
     });
   };
 
@@ -48,19 +48,19 @@ class Login extends Component {
 
     const raw = JSON.stringify({
       nis: this.state.inputNis,
-      password: this.state.inputPassword
+      password: this.state.inputPassword,
     });
 
     const requestOptions = {
       method: "POST",
       headers: myHeaders,
       body: raw,
-      redirect: "follow"
+      redirect: "follow",
     };
 
-    fetch("http://127.0.0.1:5000/auth/siswa", requestOptions)
-      .then(response => response.json())
-      .then(data => {
+    fetch(`${process.env.REACT_APP_API_URL}/auth/siswa`, requestOptions)
+      .then((response) => response.json())
+      .then((data) => {
         if (Object.entries(data).length === 0 && data.constructor === Object) {
           this.toggleError("Wrong Username / Password");
         } else {
@@ -68,7 +68,7 @@ class Login extends Component {
           this.props.history.push("/token");
         }
       })
-      .catch(error => console.log("error", error));
+      .catch((error) => console.log("error", error));
   };
 
   // Method untuk mengecek apakah inputan user kosong
@@ -136,7 +136,7 @@ class Login extends Component {
                 )}
 
                 <button
-                  onClick={event => {
+                  onClick={(event) => {
                     event.preventDefault();
                     if (this.checkInput() === true) {
                       this.handleButtonLogin(this.props);

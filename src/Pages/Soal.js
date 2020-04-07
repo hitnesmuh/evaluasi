@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import Countdown from "react-countdown";
 import { Button, Modal, ButtonToolbar } from "react-bootstrap";
+import { withRouter } from "react-router-dom";
 
 import "./Soal.css";
 
@@ -9,53 +10,31 @@ import PilihanSoal from "../Components/PilihanSoal";
 import TopBar from "../Components/TopBar";
 import NavLink from "../Components/NavLink";
 
-const SOAL = [
-  {
-    no: 1,
-    soal: "Hasil dari 12 + 2 = ... ",
-    jawaban: [
-      {
-        id: 1,
-        isi: "11"
-      },
-      {
-        id: 2,
-        isi: "12"
-      },
-      {
-        id: 3,
-        isi: "13"
-      },
-      {
-        id: 4,
-        isi: "14"
-      },
-      {
-        id: 5,
-        isi: "16"
-      }
-    ]
-  }
-];
-
-const Time = () => {
-  return <Countdown date={Date.now() + 500000}></Countdown>;
+const Time = (props) => {
+  return (
+    <Countdown
+      onComplete={() => {
+        console.log(props.history.push("/logout"));
+      }}
+      date={Date.now() + 500000}
+    ></Countdown>
+  );
 };
 
 class ModalEnd extends Component {
   state = {
-    check: false
+    check: false,
   };
 
   onCheckCheckBox = () => {
     this.setState({
-      check: !this.state.check
+      check: !this.state.check,
     });
   };
 
   falseCheckBox = () => {
     this.setState({
-      check: false
+      check: false,
     });
   };
 
@@ -93,7 +72,7 @@ class ModalEnd extends Component {
           </label>
         </Modal.Body>
         <Modal.Footer>
-          <NavLink href="/daftar-ujian">
+          <NavLink href="/logout">
             <Button
               disabled={this.state.check ? false : true}
               className="btn btn-success"
@@ -118,34 +97,81 @@ class ModalEnd extends Component {
   }
 }
 
-export default class Soal extends Component {
+class Soal extends Component {
   state = {
     customFont: "pilihan-ganda-custom-font-kecil",
     modalShow: false,
-    setModalShow: false
+    setModalShow: false,
+    soal: [
+      {
+        id: 1,
+        pertanyaan: "",
+        pilihan: [
+          {
+            id: 1,
+            id_test: 1,
+            is_right: 0,
+            pilihan: "",
+          },
+        ],
+      },
+    ],
+    nomor: 0,
   };
 
-  setModalShow = x => {
+  setModalShow = (x) => {
     this.setState({
-      modalShow: x
+      modalShow: x,
     });
   };
 
-  changeFont = size => {
+  changeFont = (size) => {
     if (size === "kecil") {
       this.setState({
-        customFont: "pilihan-ganda-custom-font-kecil"
+        customFont: "pilihan-ganda-custom-font-kecil",
       });
     } else if (size === "sedang") {
       this.setState({
-        customFont: "pilihan-ganda-custom-font-sedang"
+        customFont: "pilihan-ganda-custom-font-sedang",
       });
     } else {
       this.setState({
-        customFont: "pilihan-ganda-custom-font-besar"
+        customFont: "pilihan-ganda-custom-font-besar",
       });
     }
   };
+
+  fetchSoal = () => {
+    const requestOptions = {
+      method: "GET",
+      redirect: "follow",
+    };
+
+    fetch("http://127.0.0.1:5000/alltest", requestOptions)
+      .then((response) => response.json())
+      .then((result) => {
+        this.setState({
+          soal: result,
+        });
+      })
+      .catch((error) => console.log("error", error));
+  };
+
+  soalBerikutnya = () => {
+    this.setState({
+      nomor: this.state.nomor + 1,
+    });
+  };
+
+  soalSebelumnya = () => {
+    this.setState({
+      nomor: this.state.nomor - 1,
+    });
+  };
+
+  componentDidMount() {
+    this.fetchSoal();
+  }
 
   render() {
     return (
@@ -159,19 +185,18 @@ export default class Soal extends Component {
                   <div className="col-md-6">
                     <p className="mb-0">
                       SOAL NO
-                      <span className="soal-no">{SOAL[0].no}</span>
+                      <span className="soal-no"></span>
                     </p>
                   </div>
                   <div className="col-md-6">
                     <div className="row text-center pt-2 m-0">
                       <div className="col-md-6 soal-sisa-waktu">Sisa Waktu</div>
                       <div className="col-md-6 soal-waktu">
-                        <Time></Time>
+                        <Time history={this.props.history}></Time>
                       </div>
                     </div>
                   </div>
                 </div>
-
                 <p className="soal-ukuran">
                   Ukuran font soal:
                   <span
@@ -208,33 +233,56 @@ export default class Soal extends Component {
                     )}
                   </span>
                 </p>
-                <PilihanGanda
-                  customFont={this.state.customFont}
-                  soal={SOAL[0]}
-                ></PilihanGanda>
+
+                {this.state.soal !== null ? (
+                  <PilihanGanda
+                    customFont={this.state.customFont}
+                    soal={this.state.soal[this.state.nomor]}
+                  ></PilihanGanda>
+                ) : (
+                  ""
+                )}
               </div>
               <div className="soal-box-inner mt-3">
                 <div className="row text-center justify-content-center">
-                  <button className="btn text-uppercase btn-secondary mr-2">
-                    <i className="fas fa-arrow-left mr-3"></i>Soal Sebelumnya
-                  </button>
-                  <button className="btn text-uppercase btn-warning mr-2">
-                    <input type="checkbox"></input>Ragu Ragu
-                  </button>
-                  {/* <button className="btn text-uppercase btn-primary">
-                    Soal Berikutnya<i className="fas fa-arrow-right ml-3"></i>
-                  </button> */}
-                  {/* <button className="btn text-uppercase btn-primary">
-                    Tes Selesai<i className="fas fa-arrow-right ml-3"></i>
-                  </button> */}
-                  <ButtonToolbar>
-                    <Button
-                      className="btn text-uppercase btn-primary"
-                      variant="primary"
-                      onClick={() => this.setModalShow(true)}
+                  {this.state.nomor !== 0 ? (
+                    <button
+                      onClick={this.soalSebelumnya}
+                      className="btn text-uppercase btn-secondary mr-2"
                     >
-                      Tes Selesai
-                    </Button>
+                      <i className="fas fa-arrow-left mr-3"></i>Soal Sebelumnya
+                    </button>
+                  ) : (
+                    ""
+                  )}
+
+                  {/* <button className="btn text-uppercase btn-warning mr-2">
+                    <input type="checkbox"></input>Ragu Ragu
+                  </button> */}
+                  {this.state.nomor !== this.state.soal.length - 1 ? (
+                    <button
+                      onClick={this.soalBerikutnya}
+                      className="btn text-uppercase btn-primary"
+                    >
+                      Soal Berikutnya
+                      <i className="fas fa-arrow-right ml-3"></i>
+                    </button>
+                  ) : (
+                    ""
+                  )}
+
+                  <ButtonToolbar>
+                    {this.state.nomor === this.state.soal.length - 1 ? (
+                      <Button
+                        className="btn text-uppercase btn-warning text-white"
+                        variant="primary"
+                        onClick={() => this.setModalShow(true)}
+                      >
+                        Tes Selesai
+                      </Button>
+                    ) : (
+                      ""
+                    )}
 
                     <ModalEnd
                       show={this.state.modalShow}
@@ -255,3 +303,5 @@ export default class Soal extends Component {
     );
   }
 }
+
+export default withRouter(Soal);

@@ -4,7 +4,7 @@ import "./PilihanGanda.css";
 
 const ABCDE = ["A", "B", "C", "D", "E"];
 
-const Pilihan = props => {
+const Pilihan = (props) => {
   return (
     <div className="row">
       <div className="col-1">
@@ -27,22 +27,22 @@ const Pilihan = props => {
 export default class PilihanGanda extends Component {
   state = { selected: null };
 
-  tickBullet = bullet => {
+  tickBullet = (bullet) => {
     this.setState({
-      selected: bullet
+      selected: bullet,
     });
   };
 
   render() {
     return (
       <div className={`pilihan-ganda-card p-3 ${this.props.customFont}`}>
-        <div className="pilihan-ganda-soal">{this.props.soal.soal}</div>
+        <div className="pilihan-ganda-soal">{this.props.soal.pertanyaan}</div>
         <div className="pilihan-ganda-pilihan">
-          {this.props.soal.jawaban.map((jawaban, index) => {
+          {this.props.soal.pilihan.map((jawaban, index) => {
             return (
               <Pilihan
-                key={jawaban.id}
-                jawaban={jawaban.isi}
+                key={index}
+                jawaban={jawaban.pilihan}
                 index={index}
                 tickBullet={this.tickBullet}
                 tick={

@@ -31,7 +31,7 @@ export default function App() {
             path="/konfirmasi"
             component={Konfirmasi}
           ></ProtectedRoute>
-          <ProtectedRoute path="/logout" component={Logout}></ProtectedRoute>
+          <Route path="/logout" component={Logout}></Route>
           <ProtectedRoute
             path="/daftar-ujian"
             component={DaftarUjian}
