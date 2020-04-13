@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import MathJax from "react-mathjax";
 
 import "./PilihanGanda.css";
 
@@ -18,7 +19,11 @@ const Pilihan = (props) => {
         </div>
       </div>
       <div className="col-11">
-        <div className="pilihan-ganda-text">{props.jawaban}</div>
+        <div className="pilihan-ganda-text">
+          <MathJax.Provider>
+            <MathJax.Node inline formula={props.jawaban} />
+          </MathJax.Provider>
+        </div>
       </div>
     </div>
   );
@@ -36,7 +41,11 @@ export default class PilihanGanda extends Component {
   render() {
     return (
       <div className={`pilihan-ganda-card p-3 ${this.props.customFont}`}>
-        <div className="pilihan-ganda-soal">{this.props.soal.pertanyaan}</div>
+        <div className="pilihan-ganda-soal">
+          <MathJax.Provider>
+            <MathJax.Node inline formula={this.props.soal.pertanyaan} />
+          </MathJax.Provider>
+        </div>
         <div className="pilihan-ganda-pilihan">
           {this.props.soal.pilihan.map((jawaban, index) => {
             return (
