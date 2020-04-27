@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import { Button } from "react-bootstrap";
+import { AuthContext } from "../Contexts/Authentication";
 
 import TopBar from "../Components/TopBar";
 import NavLink from "../Components/NavLink";
@@ -11,36 +12,36 @@ const DATA_KONFIRMASI = [
   {
     no: 1,
     title: "Kode Tes",
-    content: "SWA6001"
+    content: "SWA6001",
   },
   {
     no: 2,
     title: "Status Tes",
-    content: "(MTK)"
+    content: "(MTK)",
   },
   {
     no: 3,
     title: "Mata Uji Tes",
-    content: "Matematika"
+    content: "Matematika",
   },
   {
     no: 4,
     title: "Tanggal Tes",
-    content: "09/Jan/2020"
+    content: "09/Jan/2020",
   },
   {
     no: 5,
     title: "Waktu Tes",
-    content: "09/01/2020 13:00:00"
+    content: "09/01/2020 13:00:00",
   },
   {
     no: 6,
     title: "Alokasi Waktu Tes",
-    content: "120 Menit"
-  }
+    content: "120 Menit",
+  },
 ];
 
-const Content = props => {
+const Content = (props) => {
   return (
     <div>
       <div className={`token-card-content ${props.no === 6 ? "mb-3" : ""}`}>
@@ -53,7 +54,10 @@ const Content = props => {
 };
 
 export default class Konfirmasi extends Component {
+  static contextType = AuthContext;
+
   render() {
+    console.log(this.context.data);
     return (
       <div>
         <TopBar></TopBar>
@@ -64,7 +68,7 @@ export default class Konfirmasi extends Component {
                 <div className="card-title token-card-title">
                   Konfirmasi Data Peserta
                 </div>
-                {DATA_KONFIRMASI.map(data => {
+                {DATA_KONFIRMASI.map((data) => {
                   return (
                     <Content
                       key={data.no}

@@ -90,7 +90,7 @@ class Token extends Component {
         ) {
           this.toggleError("Token Salah");
         } else {
-          this.props.history.push("/soal");
+          this.props.history.push("/konfirmasi");
         }
       })
       .catch((error) => console.log("error", error));
