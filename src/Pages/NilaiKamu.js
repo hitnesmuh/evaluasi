@@ -7,8 +7,9 @@ import "./DaftarUjian.css";
 import "./NilaiKamu.css";
 
 import { AuthContext } from "../Contexts/Authentication";
+import { withRouter } from "react-router-dom";
 
-export default class NilaiKamu extends Component {
+class NilaiKamu extends Component {
   static contextType = AuthContext;
 
   state = {
@@ -32,7 +33,6 @@ export default class NilaiKamu extends Component {
 
     fetch(
       `${process.env.REACT_APP_API_URL}/jawaban/siswa/${this.context.data.id}/${id}`,
-      // `${process.env.REACT_APP_API_URL}/jawaban/siswa/2/${id}`,
       requestOptions
     )
       .then((response) => response.json())
@@ -42,7 +42,7 @@ export default class NilaiKamu extends Component {
           redirect: "follow",
         };
 
-        fetch("http://127.0.0.1:5000/ujian/1", requestOptions)
+        fetch(`${process.env.REACT_APP_API_URL}/ujian/${id}`, requestOptions)
           .then((response) => response.json())
           .then((res) => {
             var requestOptions = {
@@ -50,7 +50,10 @@ export default class NilaiKamu extends Component {
               redirect: "follow",
             };
 
-            fetch("http://127.0.0.1:5000/kelas/id/1", requestOptions)
+            fetch(
+              `${process.env.REACT_APP_API_URL}/kelas/id/${this.context.data.id_kelas}`,
+              requestOptions
+            )
               .then((response) => response.json())
               .then((data) => {
                 let x = 0,
@@ -129,9 +132,9 @@ export default class NilaiKamu extends Component {
                 <div className="text-center nilai-kamu-nilai-akhir mb-3">
                   {this.state.nilai}
                 </div>
-                <NavLink href="/daftar-ujian">
+                {/* <NavLink href="/daftar-ujian">
                   <button className="form-control btn btn-info">Kembali</button>
-                </NavLink>
+                </NavLink> */}
               </div>
             </div>
             <div className="col-md-5">
@@ -140,11 +143,18 @@ export default class NilaiKamu extends Component {
                   <i className="fas fa-exclamation-triangle pr-3"></i>Info
                 </div>
                 <hr />.
-                <NavLink href="/deskripsi-soal">
-                  <button className="form-control btn btn-info">
-                    Lihat Keterangan
-                  </button>
-                </NavLink>
+                <button
+                  onClick={() => {
+                    const search = this.props.location.search;
+                    const params = new URLSearchParams(search);
+                    const id = params.get("x");
+
+                    this.props.history.push(`/deskripsi-soal?x=${id}`);
+                  }}
+                  className="form-control btn btn-info"
+                >
+                  Lihat Keterangan
+                </button>
               </div>
             </div>
           </div>
@@ -153,3 +163,5 @@ export default class NilaiKamu extends Component {
     );
   }
 }
+
+export default withRouter(NilaiKamu);

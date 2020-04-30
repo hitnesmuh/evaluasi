@@ -16,7 +16,7 @@ const Time = (props) => {
       onComplete={() => {
         props.history.push("/logout");
       }}
-      date={Date.now() + 500000}
+      date={Date.now() + 10000}
     ></Countdown>
   );
 };
