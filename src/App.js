@@ -13,6 +13,7 @@ import DaftarUjian from "./Pages/DaftarUjian";
 import NilaiKamu from "./Pages/NilaiKamu";
 import DeskripsiSoal from "./Pages/DeskripsiSoal";
 import NotFound from "./Pages/NotFound";
+import Ujian from "./Pages/Ujian";
 
 import React from "react";
 import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
@@ -44,6 +45,7 @@ export default function App() {
             path="/deskripsi-soal"
             component={DeskripsiSoal}
           ></ProtectedRoute>
+          <ProtectedRoute path="/ujian" component={Ujian}></ProtectedRoute>
           <Route path="*" component={() => <NotFound />} />
         </Switch>
       </Authentication>

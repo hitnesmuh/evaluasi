@@ -1,63 +1,47 @@
 import React, { Component } from "react";
-import { Button } from "react-bootstrap";
 import { AuthContext } from "../Contexts/Authentication";
+import { withRouter } from "react-router-dom";
 
 import TopBar from "../Components/TopBar";
-import NavLink from "../Components/NavLink";
 
 import "./Token.css";
 import "./Konfirmasi.css";
 
-const DATA_KONFIRMASI = [
-  {
-    no: 1,
-    title: "Kode Tes",
-    content: "SWA6001",
-  },
-  {
-    no: 2,
-    title: "Status Tes",
-    content: "(MTK)",
-  },
-  {
-    no: 3,
-    title: "Mata Uji Tes",
-    content: "Matematika",
-  },
-  {
-    no: 4,
-    title: "Tanggal Tes",
-    content: "09/Jan/2020",
-  },
-  {
-    no: 5,
-    title: "Waktu Tes",
-    content: "09/01/2020 13:00:00",
-  },
-  {
-    no: 6,
-    title: "Alokasi Waktu Tes",
-    content: "120 Menit",
-  },
-];
-
-const Content = (props) => {
-  return (
-    <div>
-      <div className={`token-card-content ${props.no === 6 ? "mb-3" : ""}`}>
-        <div className="card-text token-card-content-label">{props.nama}</div>
-        <div className="card-text text-uppercase">{props.content}</div>
-      </div>
-      {props.no !== 6 ? <hr /> : ""}
-    </div>
-  );
-};
-
-export default class Konfirmasi extends Component {
+class Konfirmasi extends Component {
   static contextType = AuthContext;
 
+  state = {
+    id: "",
+    mataPelajaran: "",
+    tanggal: "",
+  };
+
+  fetchUjian = () => {
+    const requestOptions = {
+      method: "GET",
+      redirect: "follow",
+    };
+
+    fetch(
+      `${process.env.REACT_APP_API_URL}/ujian/active/${this.context.data.id_kelas}`,
+      requestOptions
+    )
+      .then((response) => response.json())
+      .then((result) => {
+        this.setState({
+          id: result.id,
+          mataPelajaran: result.mata_pelajaran,
+          tanggal: result.tanggal_tes,
+        });
+      })
+      .catch((error) => console.log("error", error));
+  };
+
+  componentDidMount() {
+    this.fetchUjian();
+  }
+
   render() {
-    console.log(this.context.data);
     return (
       <div>
         <TopBar></TopBar>
@@ -66,31 +50,62 @@ export default class Konfirmasi extends Component {
             <div className="col-7">
               <div className="card mt-5">
                 <div className="card-title token-card-title">
-                  Konfirmasi Data Peserta
+                  Informasi Ujian
                 </div>
-                {DATA_KONFIRMASI.map((data) => {
-                  return (
-                    <Content
-                      key={data.no}
-                      no={data.no}
-                      nama={data.title}
-                      content={data.content}
-                    ></Content>
-                  );
-                })}
+                {this.state.mataPelajaran === undefined ? (
+                  <div className="d-flex justify-content-center">
+                    <h3 className="mb-4">Tidak Ada Ujian</h3>
+                  </div>
+                ) : (
+                  <div>
+                    <div className={`token-card-content mb-3`}>
+                      <div className="card-text token-card-content-label">
+                        Mata Pelajaran
+                      </div>
+                      <div className="card-text text-uppercase">
+                        {this.state.mataPelajaran}
+                      </div>
+                    </div>
+                    <hr />
+                    <div className={`token-card-content mb-3`}>
+                      <div className="card-text token-card-content-label">
+                        Tanggal
+                      </div>
+                      <div className="card-text text-uppercase">
+                        {this.state.tanggal}
+                      </div>
+                    </div>
+                    <hr />
+                    <div className={`token-card-content mb-3`}>
+                      <div className="card-text token-card-content-label">
+                        Durasi
+                      </div>
+                      <div className="card-text text-uppercase">60 Menit</div>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
             <div className="col-5">
               <div className="card mt-5 konfirmasi-righ-box">
-                Tombol MULAI hanya akan aktif apabila waktu sekarang sudah
-                melewati waktu mulai tes. Tekan tombol F5 untuk merefresh
-                halaman.
+                Apabila tidak tampil informasi ujian, Klik tombol Reresh di
+                bawah ini. Jangan refresh browser anda
               </div>
-              <NavLink href="/soal">
-                <Button className="btn btn-danger mb-2 form-control">
-                  MULAI
-                </Button>
-              </NavLink>
+              <button
+                className="form-control my-2 btn btn-primary"
+                onClick={this.fetchUjian}
+              >
+                REFRESH
+              </button>
+
+              <button
+                className="form-control btn btn-danger"
+                onClick={() => {
+                  this.props.history.push(`/ujian?x=${this.state.id}`);
+                }}
+              >
+                MULAI
+              </button>
             </div>
           </div>
         </div>
@@ -98,3 +113,5 @@ export default class Konfirmasi extends Component {
     );
   }
 }
+
+export default withRouter(Konfirmasi);

@@ -1,0 +1,23 @@
+.ujian-box-content {
+  width: 100%;
+  box-shadow: 0 1px 5px rgba(0, 0, 0, 0.15);
+  padding: 1.25rem;
+  margin-top: 1rem;
+}
+
+.ujian-bullet {
+  border: 1px solid black;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  margin-right: 1rem;
+}
+
+.selected {
+  background-color: black;
+}
+
+.clickable:hover {
+  cursor: pointer;
+  text-decoration: underline;
+}
