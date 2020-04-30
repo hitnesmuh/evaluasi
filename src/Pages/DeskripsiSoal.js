@@ -56,11 +56,6 @@ export default class DeskripsiSoal extends Component {
         )
           .then((response) => response.json())
           .then((res) => {
-            var requestOptions = {
-              method: "GET",
-              redirect: "follow",
-            };
-
             let x = [];
 
             res.forEach((data) => {

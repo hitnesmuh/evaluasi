@@ -1,6 +1,5 @@
 import React, { Component } from "react";
 
-import NavLink from "../Components/NavLink";
 import TopBar from "../Components/TopBar";
 
 import "./DaftarUjian.css";
