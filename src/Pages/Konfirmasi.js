@@ -14,24 +14,28 @@ class Konfirmasi extends Component {
     id: "",
     mataPelajaran: "",
     tanggal: "",
+    waktuSelesai: "",
   };
 
   fetchUjian = () => {
+    const search = this.props.location.search;
+    const params = new URLSearchParams(search);
+    const id = params.get("id_ujian");
+
     const requestOptions = {
       method: "GET",
       redirect: "follow",
     };
 
-    fetch(
-      `${process.env.REACT_APP_API_URL}/ujian/active/${this.context.data.id_kelas}`,
-      requestOptions
-    )
+    fetch(`${process.env.REACT_APP_API_URL}/ujian/${id}`, requestOptions)
       .then((response) => response.json())
       .then((result) => {
+        console.log(result);
         this.setState({
           id: result.id,
           mataPelajaran: result.mata_pelajaran,
           tanggal: result.tanggal_tes,
+          waktuSelesai: result.waktu_selesai,
         });
       })
       .catch((error) => console.log("error", error));
@@ -40,6 +44,23 @@ class Konfirmasi extends Component {
   componentDidMount() {
     this.fetchUjian();
   }
+
+  handleMulai = () => {
+    const requestOptions = {
+      method: "DELETE",
+      redirect: "follow",
+    };
+
+    fetch(
+      `${process.env.REACT_APP_API_URL}/jawaban/delete-all/1/1`,
+      requestOptions
+    )
+      .then((response) => response.json())
+      .then((result) => {
+        this.props.history.push(`/ujian?x=${this.state.id}`);
+      })
+      .catch((error) => console.log("error", error));
+  };
 
   render() {
     return (
@@ -78,9 +99,11 @@ class Konfirmasi extends Component {
                     <hr />
                     <div className={`token-card-content mb-3`}>
                       <div className="card-text token-card-content-label">
-                        Durasi
+                        Waktu Selesai
                       </div>
-                      <div className="card-text text-uppercase">60 Menit</div>
+                      <div className="card-text text-uppercase">
+                        {this.state.waktuSelesai}
+                      </div>
                     </div>
                   </div>
                 )}
@@ -100,9 +123,7 @@ class Konfirmasi extends Component {
 
               <button
                 className="form-control btn btn-danger"
-                onClick={() => {
-                  this.props.history.push(`/ujian?x=${this.state.id}`);
-                }}
+                onClick={this.handleMulai}
               >
                 MULAI
               </button>

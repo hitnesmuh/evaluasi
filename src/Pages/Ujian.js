@@ -10,17 +10,6 @@ import { AuthContext } from "../Contexts/Authentication";
 
 import "./Ujian.css";
 
-const Time = (props) => {
-  return (
-    <Countdown
-      onComplete={() => {
-        props.history.push("/logout");
-      }}
-      date={Date.now() + 60 * 60000}
-    ></Countdown>
-  );
-};
-
 class Ujian extends Component {
   static contextType = AuthContext;
 
@@ -32,6 +21,7 @@ class Ujian extends Component {
     },
     selected: null,
     status: 0,
+    waktu: 0,
   };
 
   fetchSoal = () => {
@@ -52,6 +42,41 @@ class Ujian extends Component {
       .then((result) => {
         this.setState({
           soal: result,
+        });
+      })
+      .catch((error) => console.log("error", error));
+  };
+
+  fetchUjian = () => {
+    const search = this.props.location.search;
+    const params = new URLSearchParams(search);
+    const id = params.get("x");
+
+    var requestOptions = {
+      method: "GET",
+      redirect: "follow",
+    };
+
+    fetch(`${process.env.REACT_APP_API_URL}/ujian/${id}`, requestOptions)
+      .then((response) => response.json())
+      .then((result) => {
+        let time = result.waktu_selesai.split(":");
+        let firstDate = new Date();
+        let secondDate = new Date(
+          firstDate.getFullYear(),
+          firstDate.getMonth(),
+          firstDate.getDate(),
+          time[0],
+          time[1]
+        );
+
+        console.log(firstDate);
+        console.log(secondDate);
+
+        const diffInMilliseconds = Math.abs(firstDate - secondDate);
+
+        this.setState({
+          waktu: diffInMilliseconds,
         });
       })
       .catch((error) => console.log("error", error));
@@ -127,6 +152,7 @@ class Ujian extends Component {
 
   componentDidMount() {
     this.fetchSoal();
+    this.fetchUjian();
   }
 
   render() {
@@ -185,10 +211,12 @@ class Ujian extends Component {
             </div>
             <div>
               Sisa Waktu:
-              <Time
-                hitungNilai={this.hitungNilai}
-                history={this.props.history}
-              ></Time>
+              <Countdown
+                onComplete={() => {
+                  this.props.history.push("/logout");
+                }}
+                date={Date.now() + this.state.waktu}
+              ></Countdown>
             </div>
           </div>
           <div style={this.state.style} className="ujian-box-content">
