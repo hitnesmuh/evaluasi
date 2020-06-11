@@ -15,6 +15,8 @@ class Konfirmasi extends Component {
     mataPelajaran: "",
     tanggal: "",
     waktuSelesai: "",
+    idKelas: "",
+    idBankSoal: "",
   };
 
   fetchUjian = () => {
@@ -30,12 +32,13 @@ class Konfirmasi extends Component {
     fetch(`${process.env.REACT_APP_API_URL}/ujian/${id}`, requestOptions)
       .then((response) => response.json())
       .then((result) => {
-        console.log(result);
         this.setState({
           id: result.id,
           mataPelajaran: result.mata_pelajaran,
           tanggal: result.tanggal_tes,
           waktuSelesai: result.waktu_selesai,
+          idKelas: result.id_kelas,
+          idBankSoal: result.id_bank_soal,
         });
       })
       .catch((error) => console.log("error", error));
@@ -52,12 +55,14 @@ class Konfirmasi extends Component {
     };
 
     fetch(
-      `${process.env.REACT_APP_API_URL}/jawaban/delete-all/1/1`,
+      `${process.env.REACT_APP_API_URL}/jawaban/delete-all/${this.context.data.id}/${this.state.id}`,
       requestOptions
     )
       .then((response) => response.json())
       .then((result) => {
-        this.props.history.push(`/ujian?x=${this.state.id}`);
+        this.props.history.push(
+          `/ujian?id_ujian=${this.state.id}&id_kelas=${this.state.idKelas}&id_bank_soal=${this.state.idBankSoal}`
+        );
       })
       .catch((error) => console.log("error", error));
   };

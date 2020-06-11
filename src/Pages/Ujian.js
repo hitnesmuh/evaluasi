@@ -14,88 +14,50 @@ class Ujian extends Component {
   static contextType = AuthContext;
 
   state = {
-    soal: [],
-    index: 0,
+    soal: {},
+    index: 1,
     style: {
       fontSize: "1rem",
     },
     selected: null,
+    dataSelected: null,
     status: 0,
     waktu: 0,
-  };
-
-  fetchSoal = () => {
-    var requestOptions = {
-      method: "GET",
-      redirect: "follow",
-    };
-
-    const search = this.props.location.search;
-    const params = new URLSearchParams(search);
-    const id = params.get("x");
-
-    fetch(
-      `${process.env.REACT_APP_API_URL}/soal/bank-soal/${id}`,
-      requestOptions
-    )
-      .then((response) => response.json())
-      .then((result) => {
-        this.setState({
-          soal: result,
-        });
-      })
-      .catch((error) => console.log("error", error));
-  };
-
-  fetchUjian = () => {
-    const search = this.props.location.search;
-    const params = new URLSearchParams(search);
-    const id = params.get("x");
-
-    var requestOptions = {
-      method: "GET",
-      redirect: "follow",
-    };
-
-    fetch(`${process.env.REACT_APP_API_URL}/ujian/${id}`, requestOptions)
-      .then((response) => response.json())
-      .then((result) => {
-        let time = result.waktu_selesai.split(":");
-        let firstDate = new Date();
-        let secondDate = new Date(
-          firstDate.getFullYear(),
-          firstDate.getMonth(),
-          firstDate.getDate(),
-          time[0],
-          time[1]
-        );
-
-        console.log(firstDate);
-        console.log(secondDate);
-
-        const diffInMilliseconds = Math.abs(firstDate - secondDate);
-
-        this.setState({
-          waktu: diffInMilliseconds,
-        });
-      })
-      .catch((error) => console.log("error", error));
+    idUjian: "",
+    idKelas: "",
+    idBankSoal: "",
+    jawaban: "",
   };
 
   addJawban = () => {
     const myHeaders = new Headers();
     myHeaders.append("Content-Type", "application/json");
 
-    const search = this.props.location.search;
-    const params = new URLSearchParams(search);
-    const id = params.get("x");
+    let jawabanSoal;
+    let analisisSoal = "Sudah benar";
+    let keteranganSoal = "Sudah benar";
+
+    if (this.state.dataSelected.is_right === 0) {
+      analisisSoal = this.state.dataSelected.analisis;
+      keteranganSoal = this.state.dataSelected.keterangan;
+    }
+
+    this.state.soal.pilihan.forEach((element) => {
+      if (element.is_right === 1) {
+        jawabanSoal = element.pilihan;
+      }
+    });
 
     const raw = JSON.stringify({
       id_siswa: this.context.data.id,
-      id_ujian: id,
-      id_soal: this.state.soal[this.state.index].id,
-      jawaban: this.state.selected,
+      id_ujian: this.state.idUjian,
+      id_soal: this.state.soal.id,
+      jawaban: this.state.dataSelected.pilihan,
+      kunci: jawabanSoal,
+      analisis: analisisSoal,
+      keterangan: keteranganSoal,
       status: this.state.status,
+      pertanyaan: this.state.soal.pertanyaan,
     });
 
     const requestOptions = {
@@ -107,12 +69,7 @@ class Ujian extends Component {
 
     fetch(`${process.env.REACT_APP_API_URL}/jawaban`, requestOptions)
       .then((response) => response.json())
-      .then((result) => {
-        this.setState({
-          index: this.state.index + 1,
-          selected: null,
-        });
-      })
+      .then((result) => console.log(result))
       .catch((error) => console.log("error", error));
   };
 
@@ -120,16 +77,31 @@ class Ujian extends Component {
     const myHeaders = new Headers();
     myHeaders.append("Content-Type", "application/json");
 
-    const search = this.props.location.search;
-    const params = new URLSearchParams(search);
-    const id = params.get("x");
+    let jawabanSoal;
+    let analisisSoal = "Sudah benar";
+    let keteranganSoal = "Sudah benar";
+
+    if (this.state.dataSelected.is_right === 0) {
+      analisisSoal = this.state.dataSelected.analisis;
+      keteranganSoal = this.state.dataSelected.keterangan;
+    }
+
+    this.state.soal.pilihan.forEach((element) => {
+      if (element.is_right === 1) {
+        jawabanSoal = element.pilihan;
+      }
+    });
 
     const raw = JSON.stringify({
       id_siswa: this.context.data.id,
-      id_ujian: id,
-      id_soal: this.state.soal[this.state.index].id,
-      jawaban: this.state.selected,
+      id_ujian: this.state.idUjian,
+      id_soal: this.state.soal.id,
+      jawaban: this.state.dataSelected.pilihan,
+      kunci: jawabanSoal,
+      analisis: analisisSoal,
+      keterangan: keteranganSoal,
       status: this.state.status,
+      pertanyaan: this.state.soal.pertanyaan,
     });
 
     const requestOptions = {
@@ -141,18 +113,66 @@ class Ujian extends Component {
 
     fetch(`${process.env.REACT_APP_API_URL}/jawaban`, requestOptions)
       .then((response) => response.json())
+      .then((result) => console.log(result))
+      .catch((error) => console.log("error", error));
+  };
+
+  fetchFirstSoal = () => {
+    const requestOptions = {
+      method: "GET",
+      redirect: "follow",
+    };
+
+    const search = this.props.location.search;
+    const params = new URLSearchParams(search);
+    const idUjian = params.get("id_ujian");
+    const idKelas = params.get("id_kelas");
+    const idBankSoal = params.get("id_bank_soal");
+
+    fetch(
+      `${process.env.REACT_APP_API_URL}/bobot/first-soal/${idKelas}/${idBankSoal}`,
+      requestOptions
+    )
+      .then((response) => response.json())
       .then((result) => {
-        const search = this.props.location.search;
-        const params = new URLSearchParams(search);
-        const id = params.get("x");
-        this.props.history.push(`/nilai-kamu?x=${id}`);
+        const requestOptions = {
+          method: "GET",
+          redirect: "follow",
+        };
+
+        fetch(
+          `${process.env.REACT_APP_API_URL}/ujian/${idUjian}`,
+          requestOptions
+        )
+          .then((response) => response.json())
+          .then((data) => {
+            let time = data.waktu_selesai.split(":");
+            let firstDate = new Date();
+            let secondDate = new Date(
+              firstDate.getFullYear(),
+              firstDate.getMonth(),
+              firstDate.getDate(),
+              time[0],
+              time[1]
+            );
+
+            const diffInMilliseconds = Math.abs(firstDate - secondDate);
+
+            this.setState({
+              waktu: diffInMilliseconds,
+              idUjian: idUjian,
+              idKelas: idKelas,
+              idBankSoal: idBankSoal,
+              soal: result,
+            });
+          })
+          .catch((error) => console.log("error", error));
       })
       .catch((error) => console.log("error", error));
   };
 
   componentDidMount() {
-    this.fetchSoal();
-    this.fetchUjian();
+    this.fetchFirstSoal();
   }
 
   render() {
@@ -226,43 +246,47 @@ class Ujian extends Component {
               <div>
                 <div>
                   <MathJax.Provider>
-                    <MathJax.Node
-                      inline
-                      formula={this.state.soal[this.state.index].pertanyaan}
-                    />
+                    <MathJax.Node inline formula={this.state.soal.pertanyaan} />
                   </MathJax.Provider>
                 </div>
                 <div>
-                  {this.state.soal[this.state.index].pilihan.map((data) => {
-                    return (
-                      <div
-                        onClick={() => {
-                          this.setState({
-                            selected: data.id,
-                            status: data.is_right,
-                          });
-                        }}
-                        key={data.id}
-                        className={`d-flex align-items-center mt-3 clickable `}
-                      >
-                        <div
-                          className={`ujian-bullet ${
-                            data.id === this.state.selected ? "selected" : ""
-                          }`}
-                        ></div>
-                        <MathJax.Provider>
-                          <MathJax.Node inline formula={data.pilihan} />
-                        </MathJax.Provider>
-                      </div>
-                    );
-                  })}
+                  {Object.entries(this.state.soal).length === 0 &&
+                  this.state.soal.constructor === Object
+                    ? ""
+                    : this.state.soal.pilihan.map((data) => {
+                        return (
+                          <div
+                            onClick={() => {
+                              this.setState({
+                                selected: data.id,
+                                dataSelected: data,
+                                status: data.is_right,
+                              });
+                            }}
+                            key={data.id}
+                            className={`d-flex align-items-center mt-3 clickable `}
+                          >
+                            <div
+                              className={`ujian-bullet ${
+                                data.id === this.state.selected
+                                  ? "selected"
+                                  : ""
+                              }`}
+                            ></div>
+                            <MathJax.Provider>
+                              <MathJax.Node inline formula={data.pilihan} />
+                            </MathJax.Provider>
+                          </div>
+                        );
+                      })}
                 </div>
                 <div className="d-flex justify-content-end">
-                  {this.state.soal.length === this.state.index + 1 ? (
+                  {this.state.index === 1 ? (
                     <button
                       onClick={() => {
                         this.onClickSelesai();
                       }}
+                      disabled={this.state.selected === null ? true : false}
                       className="btn btn-danger"
                     >
                       Selesai
