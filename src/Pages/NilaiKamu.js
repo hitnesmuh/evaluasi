@@ -20,71 +20,91 @@ class NilaiKamu extends Component {
     nilai: "",
   };
 
-  componentDidMount() {
-    const search = this.props.location.search;
-    const params = new URLSearchParams(search);
-    const id = params.get("x");
-
-    var requestOptions = {
+  fetchKelas = () => {
+    const requestOptions = {
       method: "GET",
       redirect: "follow",
     };
 
     fetch(
-      `${process.env.REACT_APP_API_URL}/jawaban/siswa/${this.context.data.id}/${id}`,
+      `${process.env.REACT_APP_API_URL}/kelas/id/${this.context.data.id_kelas}`,
       requestOptions
     )
       .then((response) => response.json())
       .then((result) => {
-        var requestOptions = {
-          method: "GET",
-          redirect: "follow",
-        };
-
-        fetch(`${process.env.REACT_APP_API_URL}/ujian/${id}`, requestOptions)
-          .then((response) => response.json())
-          .then((res) => {
-            var requestOptions = {
-              method: "GET",
-              redirect: "follow",
-            };
-
-            fetch(
-              `${process.env.REACT_APP_API_URL}/kelas/id/${this.context.data.id_kelas}`,
-              requestOptions
-            )
-              .then((response) => response.json())
-              .then((data) => {
-                let x = 0,
-                  y = 0;
-                result.forEach((data) => {
-                  if (data.status === 1) {
-                    x++;
-                  } else {
-                    y++;
-                  }
-                });
-
-                let total = (x / result.length) * 100;
-
-                this.setState({
-                  ujian: res.mata_pelajaran,
-                  kelas: data.nama,
-                  jumlahSoal: result.length,
-                  jawabanBenar: x,
-                  jawabanSalah: y,
-                  nilai: total,
-                });
-              })
-              .catch((error) => console.log("error", error));
-          })
-          .catch((error) => console.log("error", error));
+        this.setState({
+          kelas: result.nama,
+        });
       })
       .catch((error) => console.log("error", error));
+  };
+
+  fetchUjian = () => {
+    const requestOptions = {
+      method: "GET",
+      redirect: "follow",
+    };
+
+    const search = this.props.location.search;
+    const params = new URLSearchParams(search);
+    const idUjian = params.get("id_ujian");
+
+    fetch(`${process.env.REACT_APP_API_URL}/ujian/${idUjian}`, requestOptions)
+      .then((response) => response.json())
+      .then((result) => {
+        this.setState({
+          ujian: result.mata_pelajaran,
+        });
+      })
+      .catch((error) => console.log("error", error));
+  };
+
+  fetchJawaban = () => {
+    const requestOptions = {
+      method: "GET",
+      redirect: "follow",
+    };
+
+    const search = this.props.location.search;
+    const params = new URLSearchParams(search);
+    const idUjian = params.get("id_ujian");
+
+    fetch(
+      `${process.env.REACT_APP_API_URL}/jawaban/siswa/${this.context.data.id}/${idUjian}`,
+      requestOptions
+    )
+      .then((response) => response.json())
+      .then((result) => {
+        let jumlahBenar = 0;
+        let jumlahSalah = 0;
+
+        result.forEach((element) => {
+          if (element.status === 1) {
+            jumlahBenar++;
+          } else {
+            jumlahSalah++;
+          }
+        });
+
+        let nilai = (jumlahBenar / result.length) * 100;
+
+        this.setState({
+          jumlahSoal: result.length,
+          jawabanBenar: jumlahBenar,
+          jawabanSalah: jumlahSalah,
+          nilai: nilai,
+        });
+      })
+      .catch((error) => console.log("error", error));
+  };
+
+  componentDidMount() {
+    this.fetchKelas();
+    this.fetchUjian();
+    this.fetchJawaban();
   }
 
   render() {
-    console.log(this.state);
     return (
       <div>
         <TopBar></TopBar>
@@ -131,9 +151,6 @@ class NilaiKamu extends Component {
                 <div className="text-center nilai-kamu-nilai-akhir mb-3">
                   {this.state.nilai}
                 </div>
-                {/* <NavLink href="/daftar-ujian">
-                  <button className="form-control btn btn-info">Kembali</button>
-                </NavLink> */}
               </div>
             </div>
             <div className="col-md-5">
@@ -141,14 +158,14 @@ class NilaiKamu extends Component {
                 <div className="daftar-ujian-left-title">
                   <i className="fas fa-exclamation-triangle pr-3"></i>Info
                 </div>
-                <hr />.
+                <hr />
                 <button
                   onClick={() => {
                     const search = this.props.location.search;
                     const params = new URLSearchParams(search);
-                    const id = params.get("x");
+                    const id = params.get("id_ujian");
 
-                    this.props.history.push(`/deskripsi-soal?x=${id}`);
+                    this.props.history.push(`/deskripsi-soal?id_ujian=${id}`);
                   }}
                   className="form-control btn btn-info"
                 >

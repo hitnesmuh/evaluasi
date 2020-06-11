@@ -6,8 +6,16 @@ export const AuthContext = createContext();
 
 export default class Authentication extends Component {
   state = {
-    isAuth: false,
-    data: [],
+    isAuth: true,
+    data: {
+      id: 71,
+      id_kelas: 1,
+      jenis_kelamin: "Perempuan",
+      nama: "AFIANI SYAHRANI LASHA",
+      nilai_pretest: 0,
+      nis: "181910038",
+      password: "181910038",
+    },
   };
 
   changeAuthToFalse = () => {

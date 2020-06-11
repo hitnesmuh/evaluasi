@@ -27,6 +27,9 @@ class Ujian extends Component {
     idKelas: "",
     idBankSoal: "",
     jawaban: "",
+    indexMudah: 1,
+    indexSedang: 0,
+    indexSusah: 0,
   };
 
   addJawban = () => {
@@ -113,7 +116,9 @@ class Ujian extends Component {
 
     fetch(`${process.env.REACT_APP_API_URL}/jawaban`, requestOptions)
       .then((response) => response.json())
-      .then((result) => console.log(result))
+      .then((result) => {
+        this.props.history.push(`/nilai-kamu?id_ujian=${this.state.idUjian}`);
+      })
       .catch((error) => console.log("error", error));
   };
 
@@ -167,6 +172,50 @@ class Ujian extends Component {
             });
           })
           .catch((error) => console.log("error", error));
+      })
+      .catch((error) => console.log("error", error));
+  };
+
+  getNextSoal = () => {
+    const requestOptions = {
+      method: "GET",
+      redirect: "follow",
+    };
+
+    fetch(
+      `${process.env.REACT_APP_API_URL}/bobot/next-soal/${this.state.idKelas}/${this.state.idBankSoal}/${this.state.soal.id}/${this.state.dataSelected.is_right}/${this.state.indexMudah}/${this.state.indexSedang}/${this.state.indexSusah}`,
+      requestOptions
+    )
+      .then((response) => response.json())
+      .then((result) => {
+        if (result.jenis === 0) {
+          this.setState({
+            soal: result,
+            indexMudah: this.state.indexMudah + 1,
+            selected: null,
+            dataSelected: null,
+            status: 0,
+            index: this.state.index + 1,
+          });
+        } else if (result.jenis === 1) {
+          this.setState({
+            soal: result,
+            indexSedang: this.state.indexSedang + 1,
+            selected: null,
+            dataSelected: null,
+            status: 0,
+            index: this.state.index + 1,
+          });
+        } else {
+          this.setState({
+            soal: result,
+            indexSedang: this.state.indexSusah + 1,
+            selected: null,
+            dataSelected: null,
+            status: 0,
+            index: this.state.index + 1,
+          });
+        }
       })
       .catch((error) => console.log("error", error));
   };
@@ -281,7 +330,7 @@ class Ujian extends Component {
                       })}
                 </div>
                 <div className="d-flex justify-content-end">
-                  {this.state.index === 1 ? (
+                  {this.state.index === 10 ? (
                     <button
                       onClick={() => {
                         this.onClickSelesai();
@@ -295,6 +344,7 @@ class Ujian extends Component {
                     <button
                       onClick={() => {
                         this.addJawban();
+                        this.getNextSoal();
                       }}
                       disabled={this.state.selected === null ? true : false}
                       className="btn btn-secondary"

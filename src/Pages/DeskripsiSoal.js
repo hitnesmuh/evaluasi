@@ -3,6 +3,7 @@ import MathJax from "react-mathjax";
 
 import NavLink from "../Components/NavLink";
 import TopBar from "../Components/TopBar";
+import { AuthContext } from "../Contexts/Authentication";
 
 import "./DaftarUjian.css";
 
@@ -17,69 +18,54 @@ const TableDeskripsiSoal = (props) => {
       </td>
       <td>
         <MathJax.Provider>
-          <MathJax.Node inline formula={props.data.jawabanBenar} />
+          <MathJax.Node inline formula={props.data.kunci} />
         </MathJax.Provider>
       </td>
-      <td></td>
-      <td></td>
-      <td></td>
+      <td>
+        {" "}
+        <MathJax.Provider>
+          <MathJax.Node inline formula={props.data.jawaban} />
+        </MathJax.Provider>
+      </td>
+      <td>{props.data.analisis}</td>
+      <td>{props.data.keterangan}</td>
     </tr>
   );
 };
 
 export default class DeskripsiSoal extends Component {
+  static contextType = AuthContext;
+
   state = {
     list: [],
   };
 
-  componentDidMount() {
+  fetchJawaban = () => {
     const search = this.props.location.search;
     const params = new URLSearchParams(search);
-    const id = params.get("x");
+    const idUjian = params.get("id_ujian");
 
-    var requestOptions = {
+    const requestOptions = {
       method: "GET",
       redirect: "follow",
     };
 
-    fetch(`${process.env.REACT_APP_API_URL}/ujian/${id}`, requestOptions)
+    fetch(
+      `${process.env.REACT_APP_API_URL}/jawaban/siswa/${this.context.data.id}/${idUjian}`,
+      requestOptions
+    )
       .then((response) => response.json())
       .then((result) => {
-        var requestOptions = {
-          method: "GET",
-          redirect: "follow",
-        };
-
-        fetch(
-          `${process.env.REACT_APP_API_URL}/soal/bank-soal/${result.id_bank_soal}`,
-          requestOptions
-        )
-          .then((response) => response.json())
-          .then((res) => {
-            let x = [];
-
-            res.forEach((data) => {
-              let y;
-              data.pilihan.forEach((element) => {
-                if (element.is_right === 1) {
-                  y = element.pilihan;
-                }
-              });
-              let temp = {
-                pertanyaan: data.pertanyaan,
-                jawabanBenar: y,
-              };
-
-              x.push(temp);
-            });
-
-            this.setState({
-              list: x,
-            });
-          })
-          .catch((error) => console.log("error", error));
+        console.log(result);
+        this.setState({
+          list: result,
+        });
       })
       .catch((error) => console.log("error", error));
+  };
+
+  componentDidMount() {
+    this.fetchJawaban();
   }
 
   render() {
@@ -91,7 +77,7 @@ export default class DeskripsiSoal extends Component {
             <div className="col-md-12">
               <div className="daftar-ujian-left-card">
                 <div className="daftar-ujian-left-title">Deskripsi Soal</div>
-                <div>
+                <div className="table-responsive">
                   <table className="table">
                     <thead>
                       <tr>
@@ -116,12 +102,24 @@ export default class DeskripsiSoal extends Component {
                     </tbody>
                   </table>
                 </div>
+                <br />
                 <div>
-                  <NavLink href="/logout">
-                    <button className="btn form-control btn-info">
-                      Selesai
+                  <div className="d-flex">
+                    <button
+                      onClick={this.props.history.goBack}
+                      className="btn btn-info form-control mr-1"
+                    >
+                      Kembali
                     </button>
-                  </NavLink>
+                    <button
+                      onClick={() => {
+                        this.props.history.push("/logout");
+                      }}
+                      className="btn btn-danger form-control ml-1"
+                    >
+                      Keluar
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
