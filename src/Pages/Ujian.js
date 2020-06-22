@@ -349,7 +349,7 @@ class Ujian extends Component {
                       disabled={this.state.selected === null ? true : false}
                       className="btn btn-secondary"
                     >
-                      Soal Selanjutnya >
+                      Soal Selanjutnya
                     </button>
                   )}
                 </div>
