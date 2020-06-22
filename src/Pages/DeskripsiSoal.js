@@ -1,7 +1,6 @@
 import React, { Component } from "react";
 import MathJax from "react-mathjax";
 
-import NavLink from "../Components/NavLink";
 import TopBar from "../Components/TopBar";
 import { AuthContext } from "../Contexts/Authentication";
 
