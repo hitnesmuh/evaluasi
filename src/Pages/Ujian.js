@@ -292,17 +292,17 @@ class Ujian extends Component {
             {this.state.soal.length === 0 ? (
               ""
             ) : (
-              <div>
                 <div>
-                  <MathJax.Provider>
-                    <MathJax.Node inline formula={this.state.soal.pertanyaan} />
-                  </MathJax.Provider>
-                </div>
-                <div>
-                  {Object.entries(this.state.soal).length === 0 &&
-                  this.state.soal.constructor === Object
-                    ? ""
-                    : this.state.soal.pilihan.map((data) => {
+                  <div>
+                    <MathJax.Provider>
+                      <MathJax.Node inline formula={this.state.soal.pertanyaan} />
+                    </MathJax.Provider>
+                  </div>
+                  <div>
+                    {Object.entries(this.state.soal).length === 0 &&
+                      this.state.soal.constructor === Object
+                      ? ""
+                      : this.state.soal.pilihan.map((data) => {
                         return (
                           <div
                             onClick={() => {
@@ -320,7 +320,7 @@ class Ujian extends Component {
                                 data.id === this.state.selected
                                   ? "selected"
                                   : ""
-                              }`}
+                                }`}
                             ></div>
                             <MathJax.Provider>
                               <MathJax.Node inline formula={data.pilihan} />
@@ -328,33 +328,33 @@ class Ujian extends Component {
                           </div>
                         );
                       })}
+                  </div>
+                  <div className="d-flex justify-content-end">
+                    {this.state.index === 25 ? (
+                      <button
+                        onClick={() => {
+                          this.onClickSelesai();
+                        }}
+                        disabled={this.state.selected === null ? true : false}
+                        className="btn btn-danger"
+                      >
+                        Selesai
+                      </button>
+                    ) : (
+                        <button
+                          onClick={() => {
+                            this.addJawban();
+                            this.getNextSoal();
+                          }}
+                          disabled={this.state.selected === null ? true : false}
+                          className="btn btn-secondary"
+                        >
+                          Soal Selanjutnya
+                        </button>
+                      )}
+                  </div>
                 </div>
-                <div className="d-flex justify-content-end">
-                  {this.state.index === 10 ? (
-                    <button
-                      onClick={() => {
-                        this.onClickSelesai();
-                      }}
-                      disabled={this.state.selected === null ? true : false}
-                      className="btn btn-danger"
-                    >
-                      Selesai
-                    </button>
-                  ) : (
-                    <button
-                      onClick={() => {
-                        this.addJawban();
-                        this.getNextSoal();
-                      }}
-                      disabled={this.state.selected === null ? true : false}
-                      className="btn btn-secondary"
-                    >
-                      Soal Selanjutnya
-                    </button>
-                  )}
-                </div>
-              </div>
-            )}
+              )}
           </div>
         </Container>
       </div>
