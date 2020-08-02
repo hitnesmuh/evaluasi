@@ -43,13 +43,14 @@ class Token extends Component {
       "-" +
       today.getDate();
 
+    let x = today.getDate();
+
+    if (today.getDate() < 10) {
+      x = "0" + today.getDate();
+    }
+
     if (today.getMonth() + 1 < 10) {
-      date =
-        today.getFullYear() +
-        "-0" +
-        (today.getMonth() + 1) +
-        "-" +
-        today.getDate();
+      date = today.getFullYear() + "-0" + (today.getMonth() + 1) + "-" + x;
     }
 
     const requestOptions = {
